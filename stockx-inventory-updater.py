@@ -3,6 +3,14 @@ import os
 from openpyxl import load_workbook
 from forex_python.converter import CurrencyRates
 from datetime import datetime
+import json
+
+__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
+def load_config():
+    with open(os.path.join(__location__, "config.json")) as json_file:
+        data = json.load(json_file)
+        return data
 
 def resource_path(relative_path):
     try:
@@ -12,13 +20,19 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 def main():
+    config = load_config()
     c = CurrencyRates()
-    sgd_rate = c.get_rate('USD', 'SGD')
+    if config["currency"] == "USD":
+        rate = 1 
+    else:
+        rate = c.get_rate('USD', config["currency"])
 
     wb = load_workbook(resource_path("./stockx_book.xlsx"))
     ws = wb['Sheet1']
 
-    for row in ws.iter_rows(min_row=2): #start from row 2
+    for row in ws.iter_rows(min_row=config["start-row"]): 
+        if row[0].value == None:
+            break
         print(f'Doing {row[0].value}')
         urlkey = search_product(row[0].value)
         row[6].value = "Stockx"
@@ -28,8 +42,8 @@ def main():
         if result["uuid"] == None:
             break
         sales = get_sales(result["uuid"])
-        row[4].value = round((sales["last"] * sgd_rate), 2)
-        row[5].value = round((sales["average"] * sgd_rate), 2)
+        row[4].value = round((sales["last"] * rate), 2)
+        row[5].value = round((sales["average"] * rate), 2)
         now = datetime.now()
         dt_string = now.strftime("%d/%m/%Y %I:%M:%S %p")
         row[7].value = dt_string
