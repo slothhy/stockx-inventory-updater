@@ -1,5 +1,7 @@
 # stockx-inventory-updater
 
+![Screenshot](https://i.imgur.com/RIFEo54.png)
+
 ## Installation
 ```
 pip3 install -r requirements.txt
