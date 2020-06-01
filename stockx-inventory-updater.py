@@ -55,7 +55,7 @@ def search_product(sku):
     url = f'https://stockx.com/api/browse?&_search={sku}&dataType=product'
     headers = {
         'content-type': 'application/x-www-form-urlencoded',
-        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36',
         'accept': '*/*',
         'accept-ending': 'gzip, deflate, br',
         'connection': 'keep-alive'
@@ -72,7 +72,7 @@ def product_info(urlkey, size):
     url = f'https://stockx.com/api/products/{urlkey}?includes=market&currency=USD'
     headers = {
         'content-type': 'application/x-www-form-urlencoded',
-        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36',
         'accept': '*/*',
         'accept-ending': 'gzip, deflate, br',
         'connection': 'keep-alive'
@@ -96,7 +96,7 @@ def get_sales(uuid):
     url = f'https://stockx.com/api/products/{uuid}/activity?state=480&currency=USD&limit=3&page=1&sort=createdAt&order=DESC'
     headers = {
         'content-type': 'application/x-www-form-urlencoded',
-        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36',
         'accept': '*/*',
         'accept-ending': 'gzip, deflate, br',
         'connection': 'keep-alive'
