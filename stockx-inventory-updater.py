@@ -21,10 +21,11 @@ def resource_path(relative_path):
 
 def main():
     config = load_config()
-    c = CurrencyRates()
+   
     if config["currency"] == "USD":
         rate = 1 
     else:
+        c = CurrencyRates()
         rate = c.get_rate('USD', config["currency"])
 
     wb = load_workbook(resource_path("./stockx_book.xlsx"))
@@ -53,44 +54,68 @@ def main():
 def search_product(sku):
     url = f'https://stockx.com/api/browse?&_search={sku}&dataType=product'
     headers = {
-        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36'
+        'content-type': 'application/x-www-form-urlencoded',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
+        'accept': '*/*',
+        'accept-ending': 'gzip, deflate, br',
+        'connection': 'keep-alive'
     }
-    data = requests.get(url, headers=headers).json()
-    urlkey = data["Products"][0]["urlKey"]
-    return urlkey
+    req = requests.get(url, headers=headers)
+    if req.status_code == 200:
+        data = req.json()
+        urlkey = data["Products"][0]["urlKey"]
+        return urlkey
+    else:
+        print(f'Error {req.status_code}')
     
 def product_info(urlkey, size):
     url = f'https://stockx.com/api/products/{urlkey}?includes=market&currency=USD'
     headers = {
-        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36'
+        'content-type': 'application/x-www-form-urlencoded',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
+        'accept': '*/*',
+        'accept-ending': 'gzip, deflate, br',
+        'connection': 'keep-alive'
     }
-    data = requests.get(url, headers=headers).json()
-    result = {}
-    result["title"] = data["Product"]["title"]
-    result["uuid"] = None
-    for key in data["Product"]["children"]:
-        if (data["Product"]["children"][key]["shoeSize"]) == size:
-            uuid = data["Product"]["children"][key]["uuid"]
-            result["uuid"] = uuid
-            break
-    return result
+    req = requests.get(url, headers=headers)
+    if req.status_code == 200:
+        data = req.json()
+        result = {}
+        result["title"] = data["Product"]["title"]
+        result["uuid"] = None
+        for key in data["Product"]["children"]:
+            if (data["Product"]["children"][key]["shoeSize"]) == size:
+                uuid = data["Product"]["children"][key]["uuid"]
+                result["uuid"] = uuid
+                break
+        return result
+    else:
+        print(f'Error {req.status_code}')
 
 def get_sales(uuid):
     url = f'https://stockx.com/api/products/{uuid}/activity?state=480&currency=USD&limit=3&page=1&sort=createdAt&order=DESC'
     headers = {
-        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36'
+        'content-type': 'application/x-www-form-urlencoded',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
+        'accept': '*/*',
+        'accept-ending': 'gzip, deflate, br',
+        'connection': 'keep-alive'
     }
-    data = requests.get(url, headers=headers).json()
-    amount = 0
-    limit = 0
-    sales = {}
-    for i in data["ProductActivity"]:
-        if limit == 0:
-            sales["last"] = i["localAmount"]
-        amount += i["localAmount"]
-        limit += 1
-    average = amount / limit
-    sales["average"] = round(average, 2)
-    return sales
+    req = requests.get(url, headers=headers)
+    if req.status_code == 200:
+        data = req.json()
+        amount = 0
+        limit = 0
+        sales = {}
+        for i in data["ProductActivity"]:
+            if limit == 0:
+                sales["last"] = i["localAmount"]
+            amount += i["localAmount"]
+            limit += 1
+        average = amount / limit
+        sales["average"] = round(average, 2)
+        return sales
+    else:
+        print(f'Error {req.status_code}')
     
 main()
