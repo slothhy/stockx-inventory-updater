@@ -41,7 +41,7 @@ def main():
         result = product_info(urlkey, str(row[2].value))
         row[1].value = result["title"]
         if result["uuid"] == None:
-            break
+            print("Size not found, check if W or Y is needed.")
         sales = get_sales(result["uuid"])
         row[4].value = round((sales["last"] * rate), 2)
         row[5].value = round((sales["average"] * rate), 2)
