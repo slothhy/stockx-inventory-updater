@@ -19,6 +19,7 @@ Currency and row to start with can be edited in the **`config.json`** file.
 1. Fill in style code and size in the workbook provided.
 2. Open terminal or command prompt and cd to the directory.
 3. python3 **`stockx-inventory-updater.py`**
+4. Results will be output to **`stockx_book_output.xlsx`**
 
 ## Bugs
 403 errors are caused by too many requests from the same IP in a short time. \
