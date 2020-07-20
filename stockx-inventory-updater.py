@@ -73,13 +73,7 @@ def main():
 
 def search_product(sku, session):
     url = f'https://stockx.com/api/browse?&_search={sku}&dataType=product'
-    # headers = {
-    #     'content-type': 'application/x-www-form-urlencoded',
-    #     'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36',
-    #     'accept': '*/*',
-    #     'accept-ending': 'gzip, deflate, br',
-    #     'connection': 'keep-alive'
-    # }
+    
     req = session.get(url)
     if req.status_code == 200:
         data = req.json()
@@ -90,13 +84,7 @@ def search_product(sku, session):
     
 def product_info(urlkey, size, session):
     url = f'https://stockx.com/api/products/{urlkey}?includes=market&currency=USD'
-    # headers = {
-    #     'content-type': 'application/x-www-form-urlencoded',
-    #     'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36',
-    #     'accept': '*/*',
-    #     'accept-ending': 'gzip, deflate, br',
-    #     'connection': 'keep-alive'
-    # }
+
     req = session.get(url)
     if req.status_code == 200:
         data = req.json()
@@ -114,13 +102,7 @@ def product_info(urlkey, size, session):
 
 def get_sales(uuid, session):
     url = f'https://stockx.com/api/products/{uuid}/activity?state=480&currency=USD&limit=3&page=1&sort=createdAt&order=DESC'
-    # headers = {
-    #     'content-type': 'application/x-www-form-urlencoded',
-    #     'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36',
-    #     'accept': '*/*',
-    #     'accept-ending': 'gzip, deflate, br',
-    #     'connection': 'keep-alive'
-    # }
+
     req = session.get(url)
     if req.status_code == 200:
         data = req.json()

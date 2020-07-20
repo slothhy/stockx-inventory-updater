@@ -22,7 +22,7 @@ Currency and row to start with can be edited in the **`config.json`** file.
 
 ## Bugs
 403 errors are caused by too many requests from the same IP in a short time. \
-Once encountered, click [Here](https://stockx.com/api/browse?) on an incognito browser and solve the captcha. \
+Once encountered, click [here](https://stockx.com/api/browse?) on an incognito browser and solve the captcha. \
 The workaround now would be to change the starting row if the script encounters a 403 to continue from there. \
 Feel free to report any bugs running the script.
 
