@@ -62,6 +62,8 @@ def main():
             print("Size not found, check if W or Y is needed.")
             break
         sales = get_sales(result["uuid"], session)
+        if sales is None:
+            break
         row[4].value = round((sales["last"] * rate), 2)
         row[5].value = round((sales["average"] * rate), 2)
         now = datetime.now()
