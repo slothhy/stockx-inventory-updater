@@ -5,8 +5,12 @@ from forex_python.converter import CurrencyRates
 from datetime import datetime
 import json
 import time
+import collections
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
+sales_db = collections.defaultdict(dict)
+productname_db = collections.defaultdict()
 
 def load_config():
     with open(os.path.join(__location__, "config.json")) as json_file:
@@ -49,27 +53,44 @@ def main():
         if row[0].value == None:
             break
         print(f'Fetching row {row_num}: {row[0].value}')
-        urlkey = search_product(row[0].value, session)
-        if urlkey is None:
-            break
-        row[6].value = "Stockx"
-        row[6].hyperlink = f'https://stockx.com/{urlkey}'
-        result = product_info(urlkey, str(row[2].value), session)
-        if result is None:
-            break
-        row[1].value = result["title"]
-        if result["uuid"] is None:
-            print("Size not found, check if W or Y is needed.")
-            break
-        sales = get_sales(result["uuid"], session)
-        if sales is None:
-            break
-        row[4].value = round((sales["last"] * rate), 2)
-        row[5].value = round((sales["average"] * rate), 2)
-        now = datetime.now()
-        dt_string = now.strftime("%d/%m/%Y %I:%M:%S %p")
-        row[7].value = dt_string
-        row_num += 1
+        sku = row[0].value
+        size = str(row[2].value)
+
+        if sales_db[sku].get(size) is not None: #if fetched before
+            row[1].value = productname_db[sku]
+            row[6].value = "Stockx"
+            row[6].hyperlink = f'https://stockx.com/{productname_db[sku]}'
+            sales = sales_db[sku][size]
+            print('Skipping, sales exist in database')
+            row[4].value = round((sales["last"] * rate), 2)
+            row[5].value = round((sales["average"] * rate), 2)
+            now = datetime.now()
+            dt_string = now.strftime("%d/%m/%Y %I:%M:%S %p")
+            row[7].value = dt_string
+            row_num += 1
+        else:
+            urlkey = search_product(sku, session)
+            if urlkey is None:
+                break
+            row[6].value = "Stockx"
+            row[6].hyperlink = f'https://stockx.com/{urlkey}'
+            result = product_info(urlkey, size, session)
+            if result is None:
+                break
+            row[1].value = result["title"]
+            productname_db[sku] = row[1].value
+            if result["uuid"] is None:
+                print("Size not found, check if W or Y is needed.")
+                break
+            sales = get_sales(result["uuid"], sku, size, session)
+            if sales is None:
+                break
+            row[4].value = round((sales["last"] * rate), 2)
+            row[5].value = round((sales["average"] * rate), 2)
+            now = datetime.now()
+            dt_string = now.strftime("%d/%m/%Y %I:%M:%S %p")
+            row[7].value = dt_string
+            row_num += 1
         
     wb.save(resource_path("./stockx_book_output.xlsx"))
 
@@ -102,7 +123,7 @@ def product_info(urlkey, size, session):
     else:
         print(f'Error {req.status_code} product_info')
 
-def get_sales(uuid, session):
+def get_sales(uuid, sku, size, session):
     url = f'https://stockx.com/api/products/{uuid}/activity?state=480&currency=USD&limit=3&page=1&sort=createdAt&order=DESC'
 
     req = session.get(url)
@@ -118,6 +139,7 @@ def get_sales(uuid, session):
             limit += 1
         average = amount / limit
         sales["average"] = round(average, 2)
+        sales_db[sku][size] = sales
         return sales
     else:
         print(f'Error {req.status_code} get_sales')

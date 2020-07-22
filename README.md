@@ -28,6 +28,5 @@ The workaround now would be to change the starting row if the script encounters 
 Feel free to report any bugs running the script.
 
 ## To-do
-* Database to store all sales of a fetched product
 * Autorun script daily or weekly (tough with dem captchas)
 * Notify user if desired price is far off the average sale or last sale
