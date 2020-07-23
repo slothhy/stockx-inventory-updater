@@ -58,22 +58,24 @@ def main():
 
         if sales_db[sku].get(size) is not None: #if fetched before
             row[1].value = productname_db[sku]
-            row[6].value = "Stockx"
-            row[6].hyperlink = f'https://stockx.com/{productname_db[sku]}'
+            row[8].value = "Stockx"
+            row[8].hyperlink = f'https://stockx.com/{productname_db[sku]}'
             sales = sales_db[sku][size]
             print('Skipping, sales exist in database')
             row[4].value = round((sales["last"] * rate), 2)
             row[5].value = round((sales["average"] * rate), 2)
+            row[6].value = round((sales["highest_bid"] * rate), 2)
+            row[7].value = round((sales["lowest_ask"] * rate), 2)
             now = datetime.now()
             dt_string = now.strftime("%d/%m/%Y %I:%M:%S %p")
-            row[7].value = dt_string
+            row[9].value = dt_string
             row_num += 1
         else:
             urlkey = search_product(sku, session)
             if urlkey is None:
                 break
-            row[6].value = "Stockx"
-            row[6].hyperlink = f'https://stockx.com/{urlkey}'
+            row[8].value = "Stockx"
+            row[8].hyperlink = f'https://stockx.com/{urlkey}'
             result = product_info(urlkey, size, session)
             if result is None:
                 break
@@ -85,11 +87,16 @@ def main():
             sales = get_sales(result["uuid"], sku, size, session)
             if sales is None:
                 break
+            sales["highest_bid"] = result["highest_bid"]
+            sales["lowest_ask"] = result["lowest_ask"]
+            sales_db[sku][size] = sales
             row[4].value = round((sales["last"] * rate), 2)
             row[5].value = round((sales["average"] * rate), 2)
+            row[6].value = round((sales["highest_bid"] * rate), 2)
+            row[7].value = round((sales["lowest_ask"] * rate), 2)
             now = datetime.now()
             dt_string = now.strftime("%d/%m/%Y %I:%M:%S %p")
-            row[7].value = dt_string
+            row[9].value = dt_string
             row_num += 1
         
     wb.save(resource_path("./stockx_book_output.xlsx"))
@@ -98,18 +105,24 @@ def search_product(sku, session):
     url = f'https://stockx.com/api/browse?&_search={sku}&dataType=product'
     
     req = session.get(url)
-    if req.status_code == 200:
+    while req.status_code != 200:
+        print(f'Error {req.status_code} at search_product')
+        input("Please solve captcha at https://www.stockx.com on an incognito window and press enter")
+        req = session.get(url)
+    else:
         data = req.json()
         urlkey = data["Products"][0]["urlKey"]
         return urlkey
-    else:
-        print(f'Error {req.status_code} search_product')
     
 def product_info(urlkey, size, session):
     url = f'https://stockx.com/api/products/{urlkey}?includes=market&currency=USD'
 
     req = session.get(url)
-    if req.status_code == 200:
+    while req.status_code != 200:
+        print(f'Error {req.status_code} at product_info')
+        input("Please solve captcha at https://www.stockx.com on an incognito window and press enter")
+        req = session.get(url)
+    else:
         data = req.json()
         result = {}
         result["title"] = data["Product"]["title"]
@@ -117,17 +130,23 @@ def product_info(urlkey, size, session):
         for key in data["Product"]["children"]:
             if (data["Product"]["children"][key]["shoeSize"]) == size:
                 uuid = data["Product"]["children"][key]["uuid"]
+                highest_bid = data["Product"]["children"][key]["market"]["highestBid"]
+                lowest_ask = data["Product"]["children"][key]["market"]["lowestAsk"]
                 result["uuid"] = uuid
+                result["highest_bid"] = highest_bid
+                result["lowest_ask"] = lowest_ask
                 break
         return result
-    else:
-        print(f'Error {req.status_code} product_info')
 
 def get_sales(uuid, sku, size, session):
     url = f'https://stockx.com/api/products/{uuid}/activity?state=480&currency=USD&limit=3&page=1&sort=createdAt&order=DESC'
 
     req = session.get(url)
-    if req.status_code == 200:
+    while req.status_code != 200:
+        print(f'Error {req.status_code} at get_sales')
+        input("Please solve captcha at https://www.stockx.com on an incognito window and press enter")
+        req = session.get(url)
+    else:
         data = req.json()
         amount = 0
         limit = 0
@@ -139,10 +158,7 @@ def get_sales(uuid, sku, size, session):
             limit += 1
         average = amount / limit
         sales["average"] = round(average, 2)
-        sales_db[sku][size] = sales
         return sales
-    else:
-        print(f'Error {req.status_code} get_sales')
     
 if __name__ == '__main__':
     main()
