@@ -68,14 +68,14 @@ def main():
             row[7].value = round((sales["lowest_ask"] * rate), 2)
             now = datetime.now()
             dt_string = now.strftime("%d/%m/%Y %I:%M:%S %p")
-            row[9].value = dt_string
+            row[10].value = dt_string
             row_num += 1
         else:
             urlkey = search_product(sku, session)
             if urlkey is None:
                 break
-            row[8].value = "Stockx"
-            row[8].hyperlink = f'https://stockx.com/{urlkey}'
+            row[9].value = "Stockx"
+            row[9].hyperlink = f'https://stockx.com/{urlkey}'
             result = product_info(urlkey, size, session)
             if result is None:
                 break
@@ -96,7 +96,7 @@ def main():
             row[7].value = round((sales["lowest_ask"] * rate), 2)
             now = datetime.now()
             dt_string = now.strftime("%d/%m/%Y %I:%M:%S %p")
-            row[9].value = dt_string
+            row[10].value = dt_string
             row_num += 1
         
     wb.save(resource_path("./stock_book_output.xlsx"))
