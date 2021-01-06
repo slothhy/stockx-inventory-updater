@@ -33,13 +33,13 @@ def main():
         c = CurrencyRates()
         rate = c.get_rate('USD', config["currency"])
 
-    wb = load_workbook(resource_path("./stockx_book.xlsx"))
+    wb = load_workbook(resource_path("./stock_book.xlsx"))
     ws = wb['Sheet1']
 
     session = requests.Session()
     session.headers.update({
         'content-type': 'application/x-www-form-urlencoded',
-        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36',
+        'user-agent': config["user-agent"],
         'accept': '*/*',
         'accept-ending': 'gzip, deflate, br',
         'connection': 'keep-alive'
@@ -99,7 +99,7 @@ def main():
             row[9].value = dt_string
             row_num += 1
         
-    wb.save(resource_path("./stockx_book_output.xlsx"))
+    wb.save(resource_path("./stock_book_output.xlsx"))
 
 def search_product(sku, session):
     url = f'https://stockx.com/api/browse?&_search={sku}&dataType=product'
