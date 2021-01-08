@@ -58,8 +58,8 @@ def main():
 
         if sales_db[sku].get(size) is not None: #if fetched before
             row[1].value = productname_db[sku]
-            row[8].value = "Stockx"
-            row[8].hyperlink = f'https://stockx.com/{productname_db[sku]}'
+            row[9].value = "Stockx"
+            row[9].hyperlink = f'https://stockx.com/{productname_db[sku]}'
             sales = sales_db[sku][size]
             print('Skipping, sales exist in database')
             row[4].value = round((sales["last"] * rate), 2)
